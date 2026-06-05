@@ -11,6 +11,7 @@ Avatar Persona System — Setup Script
 import os
 import sys
 import shutil
+from datetime import datetime
 from pathlib import Path
 
 # 配置
@@ -63,8 +64,30 @@ def setup():
     else:
         print("  No templates directory found. Skipping.")
 
-    # 3. 更新 CLAUDE.md
-    print("\n[3/3] Checking CLAUDE.md...")
+    # 3. 初始化操作日志
+    print("\n[3/4] Initializing operation log...")
+    LOG_FILE = AVATAR_DIR / "operation_log.md"
+    if not LOG_FILE.exists():
+        init_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        log_content = (
+            "# Operation Log\n\n"
+            "> 本文件由 Avatara 系统自动维护。\n"
+            "> 所有对 `persona/` 和 `business/` 下文件的读写操作均记录于此。\n"
+            "> 用户可在此查看系统的活动状态。\n\n"
+            "**日志格式**:\n"
+            "```\n"
+            "YYYY-MM-DD HH:mm:ss | READ/WRITE | 目标文件路径 | 操作说明\n"
+            "```\n\n"
+            "---\n\n"
+            f"### {init_time} | SYSTEM | operation_log.md | 日志文件初始化\n"
+        )
+        LOG_FILE.write_text(log_content, encoding="utf-8")
+        print(f"  Created: {LOG_FILE}")
+    else:
+        print(f"  Skipped (exists): {LOG_FILE}")
+
+    # 4. 更新 CLAUDE.md
+    print("\n[4/4] Checking CLAUDE.md...")
     if CLAUDE_MD.exists():
         content = CLAUDE_MD.read_text(encoding="utf-8")
         if "avatar-persona" in content or "Avatar Persona" in content:
